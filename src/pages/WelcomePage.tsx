@@ -1,6 +1,7 @@
 import { useEffect, useState, type MouseEvent } from 'react'
 import { BookFilled } from '@ant-design/icons'
 import { Button, Form, Input, message } from 'antd'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
   AuthForm,
@@ -38,11 +39,21 @@ const footerLinks = [
 type AuthTabKey = 'signin' | 'signup'
 
 export function WelcomePage() {
-  const [messageApi, contextHolder] = message.useMessage()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [activeAuthTab, setActiveAuthTab] = useState<AuthTabKey>('signin')
   const [signInForm] = Form.useForm<LoginPayload>()
   const [signUpForm] = Form.useForm<SignupPayload>()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const params = new URLSearchParams(location.search)
+    const reason = params.get('reason')
+    const rawBack = params.get('back')
+
+  const locationState = location.state
+  const backFromState = typeof locationState?.back === 'string' ? locationState.back : undefined
+  const safeBackFromState =
+    backFromState && backFromState.startsWith('/') ? backFromState : undefined
 
   const handleCloseAuthModal = () => {
     setIsAuthModalOpen(false)
@@ -55,23 +66,26 @@ export function WelcomePage() {
 
   const loginMutation = useLogin({
     onSuccess: () => {
-      messageApi.success('Signed in successfully.')
+      message.success('Signed in successfully.')
       signInForm.resetFields()
       handleCloseAuthModal()
+      const destination =
+        safeBackFromState && safeBackFromState !== '/' ? safeBackFromState : '/dashboard'
+      navigate(destination)
     },
     onError: () => {
-      messageApi.error('Unable to sign in. Please try again.')
+      message.error('Unable to sign in. Please try again.')
     },
   })
 
   const signupMutation = useSignup({
     onSuccess: () => {
-      messageApi.success('Account created successfully.')
+      message.success('Account created successfully.')
       signUpForm.resetFields()
       setActiveAuthTab('signin')
     },
     onError: () => {
-      messageApi.error('Unable to sign up. Please try again.')
+      message.error('Unable to sign up. Please try again.')
     },
   })
 
@@ -79,10 +93,35 @@ export function WelcomePage() {
     if (!isAuthModalOpen) {
       signInForm.resetFields()
       signUpForm.resetFields()
-      loginMutation.reset()
-      signupMutation.reset()
     }
-  }, [isAuthModalOpen, loginMutation, signInForm, signUpForm, signupMutation])
+  }, [isAuthModalOpen])
+
+  useEffect(() => {
+    if (!location.search) {
+      return
+    }
+    const safeBack = rawBack && rawBack.startsWith('/') ? rawBack : undefined
+
+    if (reason === 'auth') {
+      message.warning('Please sign in to continue.')
+      const nextUrl = new URL(window.location.href)
+      nextUrl.search = ''
+      window.history.replaceState(
+        safeBack ? { ...window.history.state, usr: { back: safeBack } } : window.history.state,
+        '',
+        nextUrl,
+      )
+      if (safeBack) {
+        navigate(location.pathname, { replace: true, state: { back: safeBack } })
+      }
+    } else if (reason === 'expired') {
+      message.warning('Your session expired. Please sign in again.')
+      navigate(location.pathname, {
+        replace: true,
+        state: safeBack ? { back: safeBack } : undefined,
+      })
+    }
+  }, [location.pathname, location.search, navigate])
 
   const handleSwitchTab = (event: MouseEvent<HTMLAnchorElement>, tab: AuthTabKey) => {
     event.preventDefault()
@@ -176,7 +215,6 @@ export function WelcomePage() {
 
   return (
     <WelcomeLayout>
-      {contextHolder}
       <WelcomeHeader role="banner">
         <Brand>
           <BrandIcon aria-hidden>
@@ -196,8 +234,8 @@ export function WelcomePage() {
         <Hero>
           <HeroTitle>Welcome to Story Tailor</HeroTitle>
           <HeroSubtitle>
-            Generate insightful book reports and unique AI stories in minutes. Your personal writing assistant for crafting compelling narratives,
-            instantly.
+            Generate insightful book reports and unique AI stories in minutes. Your personal writing
+            assistant for crafting compelling narratives, instantly.
           </HeroSubtitle>
           <HeroActions size="middle">
             <HeroButton onClick={() => handleOpenAuthModal('signin')} size="large" type="primary">
@@ -218,7 +256,13 @@ export function WelcomePage() {
         </nav>
         <FooterText>© 2025 Story Tailor. All Rights Reserved.</FooterText>
       </WelcomeFooter>
-      <AuthModal destroyOnClose footer={null} onCancel={handleCloseAuthModal} open={isAuthModalOpen} title="Access Story Tailor">
+      <AuthModal
+        destroyOnHidden
+        footer={null}
+        onCancel={handleCloseAuthModal}
+        open={isAuthModalOpen}
+        title="Access Story Tailor"
+      >
         {renderAuthForm}
       </AuthModal>
     </WelcomeLayout>

@@ -12,5 +12,5 @@ const ensureEnv = (key: EnvKey, fallback?: string) => {
 }
 
 export const env = {
-  apiBaseUrl: ensureEnv('VITE_API_BASE_URL', 'http://localhost:8123'),
+  apiBaseUrl: ensureEnv('VITE_API_BASE_URL', 'http://localhost:8123/api'),
 }

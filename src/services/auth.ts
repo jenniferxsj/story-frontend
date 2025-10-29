@@ -1,6 +1,8 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, useQuery, type UseMutationOptions } from '@tanstack/react-query'
 
-import { apiClient } from '../lib/axios'
+import { tokenStore } from '../auth/tokenStore'
+import { http } from '../lib/http'
+import type { TokenBundle } from '../types/auth'
 
 export interface LoginPayload {
   email: string
@@ -13,55 +15,69 @@ export interface SignupPayload {
   password: string
 }
 
-export interface AuthResponse<T = unknown> {
-  data: T
-  message?: string
+const queryParams = {
+  retry: 1,
+  retryDelay: 1000,
+  staleTime: 5 * 60 * 1000
 }
 
-export const logout = async () => {
-  const response = await apiClient.post<AuthResponse<void>>('/auth/logout')
-  return response.data
+const loginRequest = async (payload: LoginPayload) => {
+  const { data } = await http.post<TokenBundle>('/auth/login', payload)
+  tokenStore.setAccess(data.accessToken)
+  tokenStore.setJti(data.refreshJti)
+  return data
 }
 
-export const signup = async <T = unknown>(payload: SignupPayload) => {
-  const response = await apiClient.post<AuthResponse<T>>('/auth/signup', payload)
-  return response.data
+const signupRequest = async <T = unknown>(payload: SignupPayload) => {
+  const { data } = await http.post<T>('/auth/signup', payload)
+  return data
 }
 
-export const useLogin = <
-  TData = unknown,
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: UseMutationOptions<AuthResponse<TData>, TError, LoginPayload, TContext>,
+const logoutRequest = async () => {
+  await http.post('/auth/logout')
+  tokenStore.clearAll()
+}
+
+export const useLogin = (
+  options?: UseMutationOptions<TokenBundle, unknown, LoginPayload>,
 ) =>
-  useMutation<AuthResponse<TData>, TError, LoginPayload, TContext>({
-    mutationFn: async (payload) => {
-      const response = await apiClient.post<AuthResponse<TData>>('/auth/login', payload)
-      return response.data
+  useMutation<TokenBundle, unknown, LoginPayload>({
+    mutationFn: loginRequest,
+    ...options,
+  })
+
+export const useLogout = (
+  options?: UseMutationOptions<void, unknown, void>,
+) =>
+  useMutation<void, unknown, void>({
+    mutationFn: logoutRequest,
+    ...options,
+  })
+
+export const useSignup = <TData = unknown>(
+  options?: UseMutationOptions<TData, unknown, SignupPayload>,
+) =>
+  useMutation<TData, unknown, SignupPayload>({
+    mutationFn: async (payload) => signupRequest<TData>(payload),
+    ...options,
+  })
+
+export const login = loginRequest
+export const signup = signupRequest
+export const logout = logoutRequest
+
+export function useGetCurrentUser() {
+  return useQuery({
+    queryKey: ['current-user'],
+    queryFn: async () => {
+      try {
+        const res = await http.get('/auth/currentUser');
+        console.log('user data: ', res);
+        return res?.data;
+      } catch (error) {
+        throw new Error("Error getting current user");
+      }
     },
-    ...options,
-  })
-
-export const useLogout = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: UseMutationOptions<AuthResponse<void>, TError, void, TContext>,
-) =>
-  useMutation({
-    mutationFn: () => logout(),
-    ...options,
-  })
-
-export const useSignup = <
-  TData = unknown,
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: UseMutationOptions<AuthResponse<TData>, TError, SignupPayload, TContext>,
-) =>
-  useMutation({
-    mutationFn: (payload) => signup<TData>(payload),
-    ...options,
-  })
+    ...queryParams
+  });
+};
