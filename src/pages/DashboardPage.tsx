@@ -4,12 +4,14 @@ import {
   DashboardOutlined,
   DeleteOutlined,
   EditOutlined,
+  LogoutOutlined,
   MenuOutlined,
   QuestionCircleOutlined,
-  SettingOutlined,
   StarOutlined,
-} from '@ant-design/icons'
-
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Dropdown, Spin, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import {
   ActionCard,
   Avatar,
@@ -24,7 +26,6 @@ import {
   Header,
   HeaderActions,
   HeaderStart,
-  IconButton,
   Main,
   MobileMenuButton,
   QuickStartGrid,
@@ -50,9 +51,15 @@ import {
   TableWrapper,
   Title,
   VisuallyHidden,
-} from './DashboardPage.styles'
-import { useGetCurrentUser } from '../services/auth'
-import { Spin } from 'antd'
+} from './DashboardPage.styles';
+import { useGetCurrentUser, useLogout } from '../services/auth';
+import { useGetCurrentUserProfiles } from '../services/profile';
+import dayjs from 'dayjs';
+
+const formatDate = (value: string) => {
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.format('MMM DD, YYYY') : value;
+}
 
 const sidebarLinks = [
   { label: 'Dashboard', icon: <DashboardOutlined />, href: '#', active: true },
@@ -78,30 +85,6 @@ const quickStartCards = [
     icon: <StarOutlined />,
     accent: 'accent' as const,
     href: '#',
-  },
-];
-
-const recentReports = [
-  {
-    title: "Analysis of 'Dune'",
-    author: 'Frank Herbert',
-    summary:
-      'A comprehensive analysis focusing on the intricate political landscape, ecological themes, and messianic prophecies within the desert world of Arrakis.',
-    date: 'May 20, 2024',
-  },
-  {
-    title: "Report on 'To Kill a Mockingbird'",
-    author: 'Harper Lee',
-    summary:
-      'Examining themes of racial injustice, moral growth, and the loss of innocence through the eyes of Scout Finch in the American South.',
-    date: 'May 15, 2024',
-  },
-  {
-    title: 'The Catcher in the Rye: A Study',
-    author: 'J.D. Salinger',
-    summary:
-      'An exploration of teenage angst, alienation, and the critique of societal phoniness as depicted through the protagonist, Holden Caulfield.',
-    date: 'May 12, 2024',
   },
 ];
 
@@ -133,9 +116,36 @@ const generatedStories = [
 ];
 
 const DashboardPage = () => {
-  const {data: currentUser, isLoading: loadingCurrentUser} = useGetCurrentUser();
-  
-  if (loadingCurrentUser) {
+  const navigate = useNavigate();
+  const { data: currentUser, isLoading: loadingCurrentUser } = useGetCurrentUser();
+  const { data: profiles, isLoading: loadingProfiles} = useGetCurrentUserProfiles(currentUser?.username, 0, 5, 'createdAt,desc');
+
+  const logoutMutation = useLogout({
+    onSuccess: () => {
+      message.success('Signed out successfully.');
+      navigate('/');
+    },
+    onError: () => {
+      message.error('Unable to sign out. Please try again.');
+    },
+  });
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'logout',
+      label: 'Log Out',
+      icon: <LogoutOutlined />,
+      disabled: logoutMutation.isPending,
+    },
+  ];
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'logout') {
+      logoutMutation.mutate();
+    }
+  };
+
+  if (loadingCurrentUser || loadingProfiles || !currentUser || !profiles) {
     return <Spin />;
   };
 
@@ -169,13 +179,24 @@ const DashboardPage = () => {
             <MobileMenuButton aria-label="Open navigation">
               <MenuOutlined />
             </MobileMenuButton>
-            <Title>Welcome, {currentUser.username}!</Title>
+            <Title>Welcome, {currentUser?.username ?? 'User'}!</Title>
           </HeaderStart>
           <HeaderActions>
-            <IconButton aria-label="Open settings">
-              <SettingOutlined />
-            </IconButton>
-            <Avatar $image="https://lh3.googleusercontent.com/aida-public/AB6AXuBdRNtZ16GzoWr-5G3wOBRXbBWati6tfb7fsK2RaPSWmbm5bcBZZiKs7zuG-4Wy7Y29fuTJ5R7fXo99mUQr8jMvEuX52PjVfpTtUZtscMCyjHTIap_QatlCOYN5liJTWZNlpT67Le6sCf_ZQbhzJPEMI3dn2mUsN_G-P1At5JehxLWsYT2SvTnYXEppnHXxs4lR8w7TRQRUhe3kgySSA-uP1XbUtHWbUwltvuyO7J7KdMB61qi1F0qK3etk1DH51ZY3qCyjjDodTBo" />
+            <Dropdown
+              menu={{
+                items: userMenuItems,
+                onClick: handleMenuClick,
+              }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Avatar
+                $image="https://lh3.googleusercontent.com/aida-public/AB6AXuBdRNtZ16GzoWr-5G3wOBRXbBWati6tfb7fsK2RaPSWmbm5bcBZZiKs7zuG-4Wy7Y29fuTJ5R7fXo99mUQr8jMvEuX52PjVfpTtUZtscMCyjHTIap_QatlCOYN5liJTWZNlpT67Le6sCf_ZQbhzJPEMI3dn2mUsN_G-P1At5JehxLWsYT2SvTnYXEppnHXxs4lR8w7TRQRUhe3kgySSA-uP1XbUtHWbUwltvuyO7J7KdMB61qi1F0qK3etk1DH51ZY3qCyjjDodTBo"
+                role="button"
+                aria-label="Account menu"
+                tabIndex={0}
+              />
+            </Dropdown>
           </HeaderActions>
         </Header>
         <Content>
@@ -214,15 +235,15 @@ const DashboardPage = () => {
                 </SectionLink>
               </SectionHeader>
               <ReportsGrid>
-                {recentReports.map(({ title, author, summary, date }) => (
+                {profiles.map(({ title, author, styleSummary, createdAt }) => (
                   <ReportCard key={title}>
                     <ReportMeta>
                       <h3>{title}</h3>
                       <p>by {author}</p>
                     </ReportMeta>
-                    <ReportExcerpt>{summary}</ReportExcerpt>
+                    <ReportExcerpt>{styleSummary}</ReportExcerpt>
                     <ReportFooter>
-                      <span>{date}</span>
+                      <span>{formatDate(createdAt)}</span>
                       <ReportActions>
                         <ReportActionButton aria-label={`Edit ${title}`}>
                           <EditOutlined />
@@ -250,7 +271,6 @@ const DashboardPage = () => {
                   <thead>
                     <tr>
                       <th scope="col">Title</th>
-                      <th scope="col">Type</th>
                       <th scope="col">Status</th>
                       <th scope="col">Last Modified</th>
                       <th scope="col">
@@ -259,10 +279,9 @@ const DashboardPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {generatedStories.map(({ title, type, status, date, href, actionLabel }) => (
+                    {generatedStories.map(({ title, status, date, href, actionLabel }) => (
                       <tr key={title}>
                         <td>{title}</td>
-                        <td>{type}</td>
                         <td>
                           <StatusBadge $variant={status}>
                             <BadgeDot />

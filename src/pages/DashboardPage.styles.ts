@@ -223,6 +223,17 @@ export const Avatar = styled.div<AvatarProps>`
   height: 40px;
   border-radius: 50%;
   background: ${({ $image }) => `url(${$image}) center/cover no-repeat`};
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary};
+    outline-offset: 2px;
+  }
 `
 
 export const Content = styled.main`

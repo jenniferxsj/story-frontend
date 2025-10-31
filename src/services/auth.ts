@@ -2,7 +2,7 @@ import { useMutation, useQuery, type UseMutationOptions } from '@tanstack/react-
 
 import { tokenStore } from '../auth/tokenStore'
 import { http } from '../lib/http'
-import type { TokenBundle } from '../types/auth'
+import type { TokenBundle, User } from '../types/auth'
 
 export interface LoginPayload {
   email: string
@@ -71,11 +71,11 @@ export function useGetCurrentUser() {
     queryKey: ['current-user'],
     queryFn: async () => {
       try {
-        const res = await http.get('/auth/currentUser');
-        console.log('user data: ', res);
-        return res?.data;
-      } catch (error) {
-        throw new Error("Error getting current user");
+        const res = await http.get<User>('/auth/currentUser')
+        console.log('user data: ', res)
+        return res?.data
+      } catch {
+        throw new Error('Error getting current user')
       }
     },
     ...queryParams

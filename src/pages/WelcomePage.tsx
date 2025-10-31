@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { BookFilled } from '@ant-design/icons'
 import { Button, Form, Input, message } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -27,7 +28,14 @@ import {
   WelcomeHeader,
   WelcomeLayout,
 } from './WelcomePage.styles'
-import { useLogin, useSignup, type LoginPayload, type SignupPayload } from '../services/auth'
+import {
+  useGetCurrentUser,
+  useLogin,
+  useLogout,
+  useSignup,
+  type LoginPayload,
+  type SignupPayload,
+} from '../services/auth'
 
 const footerLinks = [
   { label: 'About', href: '#' },
@@ -45,10 +53,17 @@ export function WelcomePage() {
   const [signUpForm] = Form.useForm<SignupPayload>()
   const location = useLocation()
   const navigate = useNavigate()
-
-  const params = new URLSearchParams(location.search)
-    const reason = params.get('reason')
-    const rawBack = params.get('back')
+  const queryClient = useQueryClient()
+  const { data: currentUser } = useGetCurrentUser()
+  const logoutMutation = useLogout({
+    onSuccess: () => {
+      message.success('Signed out successfully.')
+      queryClient.removeQueries({ queryKey: ['current-user'] })
+    },
+    onError: () => {
+      message.error('Unable to sign out. Please try again.')
+    },
+  })
 
   const locationState = location.state
   const backFromState = typeof locationState?.back === 'string' ? locationState.back : undefined
@@ -94,12 +109,16 @@ export function WelcomePage() {
       signInForm.resetFields()
       signUpForm.resetFields()
     }
-  }, [isAuthModalOpen])
+  }, [isAuthModalOpen, signInForm, signUpForm])
 
   useEffect(() => {
     if (!location.search) {
       return
     }
+
+    const params = new URLSearchParams(location.search)
+    const reason = params.get('reason')
+    const rawBack = params.get('back')
     const safeBack = rawBack && rawBack.startsWith('/') ? rawBack : undefined
 
     if (reason === 'auth') {
@@ -225,9 +244,20 @@ export function WelcomePage() {
           </BrandText>
         </Brand>
         <HeaderActions size="middle">
-          <HeaderButton onClick={() => handleOpenAuthModal('signin')} type="primary">
-            Sign In
-          </HeaderButton>
+          {currentUser ? (
+            <>
+              <HeaderButton onClick={() => navigate('/dashboard')} type="primary">
+                Go to Dashboard
+              </HeaderButton>
+              <Button danger loading={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>
+                Log Out
+              </Button>
+            </>
+          ) : (
+            <HeaderButton onClick={() => handleOpenAuthModal('signin')} type="primary">
+              Sign In
+            </HeaderButton>
+          )}
         </HeaderActions>
       </WelcomeHeader>
       <WelcomeContent>
@@ -238,9 +268,15 @@ export function WelcomePage() {
             assistant for crafting compelling narratives, instantly.
           </HeroSubtitle>
           <HeroActions size="middle">
-            <HeroButton onClick={() => handleOpenAuthModal('signin')} size="large" type="primary">
-              Get Started
-            </HeroButton>
+            {currentUser ? (
+              <HeroButton onClick={() => navigate('/dashboard')} size="large" type="primary">
+                Open Dashboard
+              </HeroButton>
+            ) : (
+              <HeroButton onClick={() => handleOpenAuthModal('signin')} size="large" type="primary">
+                Get Started
+              </HeroButton>
+            )}
           </HeroActions>
         </Hero>
       </WelcomeContent>
