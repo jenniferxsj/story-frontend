@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { http } from "../lib/http";
-import type { BookProfile, PageRsp } from "../types/story";
+import type { PageRsp, Story } from "../types/story";
 
 const queryParams = {
   retry: 1,
@@ -8,12 +8,12 @@ const queryParams = {
   staleTime: 5 * 60 * 1000
 }
 
-export function useGetCurrentUserProfiles(username: string | undefined, page: number, size: number, sort: string) {
+export function useGetCurrentUserStories(username: string | undefined, page: number, size: number, sort: string) {
   return useQuery({
-    queryKey: ['user-profile', username, page, size, sort],
+    queryKey: ['user-story', username, page, size, sort],
     queryFn: async () => {
       try {
-        const res = await http.get<PageRsp<BookProfile[]>>('/profile/currentUser', {
+        const res = await http.get<PageRsp<Story[]>>('/story/currentUser', {
             params: {
                 page, size, sort
             }
@@ -21,7 +21,7 @@ export function useGetCurrentUserProfiles(username: string | undefined, page: nu
         console.log('profile data: ', res)
         return res?.data?.content;
       } catch {
-        throw new Error('Error getting current user profiles')
+        throw new Error('Error getting current user stories')
       }
     },
     enabled: !!username,

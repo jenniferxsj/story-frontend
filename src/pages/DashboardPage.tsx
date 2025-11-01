@@ -55,6 +55,7 @@ import {
 import { useGetCurrentUser, useLogout } from '../services/auth';
 import { useGetCurrentUserProfiles } from '../services/profile';
 import dayjs from 'dayjs';
+import { useGetCurrentUserStories } from '../services/story';
 
 const formatDate = (value: string) => {
   const parsed = dayjs(value);
@@ -88,37 +89,11 @@ const quickStartCards = [
   },
 ];
 
-const generatedStories = [
-  {
-    title: 'The Last Starlight',
-    type: 'AI Story',
-    status: 'completed' as const,
-    date: 'May 18, 2024',
-    href: '#',
-    actionLabel: 'View',
-  },
-  {
-    title: 'Cyberpunk Dreams',
-    type: 'AI Story',
-    status: 'draft' as const,
-    date: 'May 17, 2024',
-    href: '#',
-    actionLabel: 'Edit',
-  },
-  {
-    title: 'The Enchanted Forest',
-    type: 'AI Story',
-    status: 'generating' as const,
-    date: 'May 16, 2024',
-    href: '#',
-    actionLabel: 'View',
-  },
-];
-
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { data: currentUser, isLoading: loadingCurrentUser } = useGetCurrentUser();
-  const { data: profiles, isLoading: loadingProfiles} = useGetCurrentUserProfiles(currentUser?.username, 0, 5, 'createdAt,desc');
+  const { data: profiles, isLoading: loadingProfiles } = useGetCurrentUserProfiles(currentUser?.username, 0, 3, 'createdAt,desc');
+  const { data: stories, isLoading: loadingStories } = useGetCurrentUserStories(currentUser?.username, 0, 5, 'createdAt,desc');
 
   const logoutMutation = useLogout({
     onSuccess: () => {
@@ -145,7 +120,7 @@ const DashboardPage = () => {
     }
   };
 
-  if (loadingCurrentUser || loadingProfiles || !currentUser || !profiles) {
+  if (loadingCurrentUser || loadingProfiles || !currentUser || !profiles || loadingStories || !stories) {
     return <Spin />;
   };
 
@@ -271,7 +246,7 @@ const DashboardPage = () => {
                   <thead>
                     <tr>
                       <th scope="col">Title</th>
-                      <th scope="col">Status</th>
+                      <th scope="col">Progress (current/target words)</th>
                       <th scope="col">Last Modified</th>
                       <th scope="col">
                         <VisuallyHidden>Actions</VisuallyHidden>
@@ -279,18 +254,15 @@ const DashboardPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {generatedStories.map(({ title, status, date, href, actionLabel }) => (
+                    {stories.map(({ title, currentWords, targetWords, createdAt }) => (
                       <tr key={title}>
                         <td>{title}</td>
                         <td>
-                          <StatusBadge $variant={status}>
-                            <BadgeDot />
-                            <span>{status === 'completed' ? 'Completed' : status === 'draft' ? 'Draft' : 'Generating'}</span>
-                          </StatusBadge>
+                          {currentWords} out of {targetWords}
                         </td>
-                        <td>{date}</td>
+                        <td>{formatDate(createdAt)}</td>
                         <td>
-                          <TableAction href={href}>{actionLabel}</TableAction>
+                          <TableAction href={'#'}>{'Edit'}</TableAction>
                         </td>
                       </tr>
                     ))}

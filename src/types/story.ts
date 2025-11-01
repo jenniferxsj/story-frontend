@@ -35,3 +35,15 @@ export interface PageRsp<T> {
     numberOfElements: number;
     empty: boolean;
 }
+
+export interface Story {
+    id: number;
+    outlineId: number;
+    userId: string;
+    title: string;
+    targetWords: number;
+    currentWords: number;
+    stateJson: {[key: string]: any};
+    createdAt: string;
+    updatedAt: string;
+}
