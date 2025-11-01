@@ -4,6 +4,9 @@ import './App.css'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { WelcomePage } from './pages/WelcomePage'
 import DashboardPage from './pages/DashboardPage'
+import { AppLayout } from './layouts/AppLayout'
+import { BookReportPage } from './pages/BookReportPage'
+import { StoryPage } from './pages/StoryPage'
 
 function App() {
   return (
@@ -11,7 +14,11 @@ function App() {
       <Routes>
         <Route element={<WelcomePage />} path="/" />
         <Route element={<ProtectedRoute />}>
-          <Route element={<DashboardPage />} path="/dashboard" />
+          <Route element={<AppLayout />}>
+            <Route element={<DashboardPage />} path="/dashboard" />
+            <Route element={<BookReportPage />} path="/reports" />
+            <Route element={<StoryPage />} path="/stories" />
+          </Route>
         </Route>
         <Route element={<Navigate replace to="/" />} path="*" />
       </Routes>

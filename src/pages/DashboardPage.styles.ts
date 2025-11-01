@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 
-const colors = {
+export const colors = {
   primary: '#2A4D69',
   accent: '#43A0A8',
   backgroundLight: '#F8F9FA',
@@ -13,228 +13,7 @@ const colors = {
   subtleDark: '#adb5bd',
   borderLight: '#E9ECEF',
   borderDark: '#343A40',
-}
-
-export const DashboardLayout = styled.div`
-  display: flex;
-  min-height: 100vh;
-  background: ${colors.backgroundLight};
-  color: ${colors.textLight};
-
-  @media (prefers-color-scheme: dark) {
-    background: ${colors.backgroundDark};
-    color: ${colors.textDark};
-  }
-`
-
-export const Sidebar = styled.aside`
-  position: sticky;
-  top: 0;
-  display: none;
-  width: 256px;
-  flex-shrink: 0;
-  border-right: 1px solid ${colors.borderLight};
-  background: ${colors.surfaceLight};
-
-  @media (min-width: 768px) {
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    border-right-color: ${colors.borderDark};
-    background: rgba(26, 26, 42, 0.5);
-  }
-`
-
-export const SidebarBrand = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 24px;
-  height: 64px;
-  border-bottom: 1px solid ${colors.borderLight};
-
-  @media (prefers-color-scheme: dark) {
-    border-bottom-color: ${colors.borderDark};
-  }
-`
-
-export const SidebarNav = styled.nav`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 24px 16px;
-`
-
-interface SidebarLinkProps {
-  $active?: boolean
-}
-
-export const SidebarLink = styled.a<SidebarLinkProps>`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${colors.subtleLight};
-  transition: all 0.2s ease;
-  background: transparent;
-
-  ${({ $active }) =>
-    $active &&
-    css`
-      background: rgba(42, 77, 105, 0.1);
-      color: ${colors.primary};
-    `}
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: ${colors.primary};
-  }
-
-  @media (prefers-color-scheme: dark) {
-    color: ${colors.subtleDark};
-
-    ${({ $active }) =>
-      $active &&
-      css`
-        background: rgba(67, 160, 168, 0.2);
-        color: ${colors.accent};
-      `}
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: ${colors.accent};
-    }
-  }
-`
-
-export const SidebarFooter = styled.div`
-  margin-top: auto;
-  padding: 16px;
-  border-top: 1px solid ${colors.borderLight};
-
-  @media (prefers-color-scheme: dark) {
-    border-top-color: ${colors.borderDark};
-  }
-`
-
-export const Main = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-`
-
-export const Header = styled.header`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 24px;
-  height: 64px;
-  border-bottom: 1px solid ${colors.borderLight};
-  background: ${colors.surfaceLight};
-
-  @media (min-width: 640px) {
-    padding: 0 40px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    border-bottom-color: ${colors.borderDark};
-    background: rgba(26, 26, 42, 0.5);
-  }
-`
-
-export const HeaderStart = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`
-
-export const MobileMenuButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  @media (min-width: 768px) {
-    display: none;
-  }
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.05);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-  }
-`
-
-export const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-left: auto;
-`
-
-export const IconButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.05);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-  }
-`
-
-interface AvatarProps {
-  $image: string
-}
-
-export const Avatar = styled.div<AvatarProps>`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${({ $image }) => `url(${$image}) center/cover no-repeat`};
-  cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.03);
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${colors.primary};
-    outline-offset: 2px;
-  }
-`
+};
 
 export const Content = styled.main`
   flex: 1;
@@ -243,25 +22,25 @@ export const Content = styled.main`
   background: ${colors.backgroundLight};
 
   @media (min-width: 640px) {
-    padding: 40px;
+    padding: 20px 40px;
   }
 
   @media (prefers-color-scheme: dark) {
     background: ${colors.backgroundDark};
   }
-`
+`;
 
 export const SectionStack = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
-`
+`;
 
 export const Section = styled.section`
   display: flex;
   flex-direction: column;
   gap: 24px;
-`
+`;
 
 export const SectionHeading = styled.div`
   display: flex;
@@ -287,7 +66,7 @@ export const SectionHeading = styled.div`
       color: ${colors.subtleDark};
     }
   }
-`
+`;
 
 export const QuickStartGrid = styled.div`
   display: grid;
@@ -296,11 +75,11 @@ export const QuickStartGrid = styled.div`
   @media (min-width: 1024px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-`
+`;
 
 interface ActionCardProps {
   $accent: 'primary' | 'accent'
-}
+};
 
 export const ActionCard = styled.a<ActionCardProps>`
   position: relative;
@@ -344,7 +123,7 @@ export const ActionCard = styled.a<ActionCardProps>`
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
     }
   }
-`
+`;
 
 export const CardIcon = styled.div`
   display: inline-flex;
@@ -356,7 +135,7 @@ export const CardIcon = styled.div`
   background: var(--accent-color);
   color: #ffffff;
   font-size: 26px;
-`
+`;
 
 export const CardBody = styled.div`
   z-index: 1;
@@ -378,7 +157,7 @@ export const CardBody = styled.div`
       color: ${colors.subtleDark};
     }
   }
-`
+`;
 
 export const CardFooter = styled.div`
   display: flex;
@@ -389,7 +168,7 @@ export const CardFooter = styled.div`
   color: var(--accent-color);
   font-weight: 600;
   font-size: 14px;
-`
+`;
 
 export const CardWatermark = styled.span`
   position: absolute;
@@ -403,7 +182,7 @@ export const CardWatermark = styled.span`
   @media (prefers-color-scheme: dark) {
     color: var(--accent-watermark-dark);
   }
-`
+`;
 
 export const SectionHeader = styled.div`
   display: flex;
@@ -417,7 +196,7 @@ export const SectionHeader = styled.div`
     font-size: 28px;
     font-weight: 700;
   }
-`
+`;
 
 export const SectionLink = styled.a`
   display: inline-flex;
@@ -435,7 +214,7 @@ export const SectionLink = styled.a`
   @media (prefers-color-scheme: dark) {
     color: ${colors.accent};
   }
-`
+`;
 
 export const ReportsGrid = styled.div`
   display: grid;
@@ -448,7 +227,7 @@ export const ReportsGrid = styled.div`
   @media (min-width: 1024px) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-`
+`;
 
 export const ReportCard = styled.div`
   display: flex;
@@ -465,7 +244,7 @@ export const ReportCard = styled.div`
     border-color: ${colors.borderDark};
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
   }
-`
+`;
 
 export const ReportMeta = styled.div`
   display: flex;
@@ -489,7 +268,7 @@ export const ReportMeta = styled.div`
       color: ${colors.subtleDark};
     }
   }
-`
+`;
 
 export const ReportExcerpt = styled.p`
   margin: 0;
@@ -503,7 +282,7 @@ export const ReportExcerpt = styled.p`
   @media (prefers-color-scheme: dark) {
     color: ${colors.subtleDark};
   }
-`
+`;
 
 export const ReportFooter = styled.div`
   display: flex;
@@ -517,13 +296,13 @@ export const ReportFooter = styled.div`
   @media (prefers-color-scheme: dark) {
     color: ${colors.subtleDark};
   }
-`
+`;
 
 export const ReportActions = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`
+`;
 
 export const ReportActionButton = styled.button`
   border: none;
@@ -545,7 +324,7 @@ export const ReportActionButton = styled.button`
       color: ${colors.accent};
     }
   }
-`
+`;
 
 export const TableWrapper = styled.div`
   overflow-x: auto;
@@ -598,13 +377,13 @@ export const TableWrapper = styled.div`
       color: ${colors.textDark};
     }
   }
-`
+`;
 
-type StatusVariant = 'completed' | 'draft' | 'generating'
+type StatusVariant = 'completed' | 'draft' | 'generating';
 
 interface StatusBadgeProps {
   $variant: StatusVariant
-}
+};
 
 const statusStyles: Record<StatusVariant, { lightBg: string; lightColor: string; darkBg: string; darkColor: string }> =
   {
@@ -626,7 +405,7 @@ const statusStyles: Record<StatusVariant, { lightBg: string; lightColor: string;
       darkBg: 'rgba(234, 179, 8, 0.25)',
       darkColor: '#fde68a',
     },
-  }
+  };
 
 export const StatusBadge = styled.span<StatusBadgeProps>`
   display: inline-flex;
@@ -643,7 +422,7 @@ export const StatusBadge = styled.span<StatusBadgeProps>`
     background: ${({ $variant }) => statusStyles[$variant].darkBg};
     color: ${({ $variant }) => statusStyles[$variant].darkColor};
   }
-`
+`;
 
 export const TableAction = styled.a`
   color: ${colors.primary};
@@ -657,28 +436,7 @@ export const TableAction = styled.a`
   @media (prefers-color-scheme: dark) {
     color: ${colors.accent};
   }
-`
-
-export const Title = styled.h1`
-  margin: 0;
-  font-family: 'Newsreader', serif;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-`
-
-export const BrandIcon = styled.div`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  color: ${colors.primary};
-
-  @media (prefers-color-scheme: dark) {
-    color: #ffffff;
-  }
-`
+`;
 
 export const BadgeDot = styled.span`
   display: inline-block;
@@ -686,7 +444,7 @@ export const BadgeDot = styled.span`
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-`
+`;
 
 export const VisuallyHidden = styled.span`
   position: absolute;
@@ -698,4 +456,4 @@ export const VisuallyHidden = styled.span`
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-`
+`;

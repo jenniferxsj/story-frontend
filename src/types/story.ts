@@ -43,7 +43,7 @@ export interface Story {
     title: string;
     targetWords: number;
     currentWords: number;
-    stateJson: {[key: string]: any};
+    stateJson: Record<string, unknown>;
     createdAt: string;
     updatedAt: string;
 }
