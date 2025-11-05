@@ -8,7 +8,12 @@ const queryParams = {
   staleTime: 5 * 60 * 1000
 }
 
-export function useGetCurrentUserStories(username: string | undefined, page: number, size: number, sort: string) {
+export function useGetCurrentUserStories(
+  username: string | undefined,
+  page: number,
+  size: number,
+  sort: string,
+) {
   return useQuery({
     queryKey: ['user-story', username, page, size, sort],
     queryFn: async () => {
@@ -18,8 +23,7 @@ export function useGetCurrentUserStories(username: string | undefined, page: num
                 page, size, sort
             }
         })
-        console.log('profile data: ', res)
-        return res?.data?.content;
+        return res?.data
       } catch {
         throw new Error('Error getting current user stories')
       }

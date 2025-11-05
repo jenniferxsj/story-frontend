@@ -119,7 +119,7 @@ const DashboardPage = () => {
             </SectionLink>
           </SectionHeader>
           <ReportsGrid>
-            {profiles.map(({ title, author, styleSummary, createdAt }) => (
+            {profiles.content?.map(({ title, author, styleSummary, createdAt }) => (
               <ReportCard key={title}>
                 <ReportMeta>
                   <h3>{title}</h3>
@@ -163,7 +163,7 @@ const DashboardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {stories.map(
+                {stories.content?.map(
                   ({ title, currentWords, targetWords, createdAt }) => (
                     <tr key={title}>
                       <td>{title}</td>

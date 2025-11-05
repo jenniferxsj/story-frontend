@@ -12,22 +12,11 @@ export const PageHeader = styled.header`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`
 
-export const PageTitle = styled.h1`
-  margin: 0;
-  font-family: 'Newsreader', serif;
-  font-size: clamp(1.75rem, 2.4vw, 2rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: ${colors.textLight};
-
-  @media (prefers-color-scheme: dark) {
-    color: ${colors.textDark};
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
 `
 
@@ -161,6 +150,12 @@ export const CollectionWrapper = styled.section`
   display: flex;
   flex-direction: column;
   gap: 24px;
+`
+
+export const CollectionPagination = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 8px;
 `
 
 export const CollectionGrid = styled.div`
