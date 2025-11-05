@@ -30,7 +30,7 @@ import {
   TableWrapper,
   VisuallyHidden,
 } from "./DashboardPage.styles";
-import { useGetCurrentUser } from "../services/auth";
+import { useUser } from "../context/UserContext";
 import { useGetCurrentUserProfiles } from "../services/profile";
 import dayjs from "dayjs";
 import { useGetCurrentUserStories } from "../services/story";
@@ -60,12 +60,12 @@ const quickStartCards = [
 ];
 
 const DashboardPage = () => {
-  const { data: currentUser, isLoading: loadingCurrentUser } =
-    useGetCurrentUser();
+  const { user: currentUser, isLoading: loadingCurrentUser } = useUser();
+  const username = currentUser?.username;
   const { data: profiles, isLoading: loadingProfiles } =
-    useGetCurrentUserProfiles(currentUser?.username, 0, 3, "createdAt,desc");
+    useGetCurrentUserProfiles(username, 0, 3, "createdAt,desc");
   const { data: stories, isLoading: loadingStories } = useGetCurrentUserStories(
-    currentUser?.username,
+    username,
     0,
     5,
     "createdAt,desc"

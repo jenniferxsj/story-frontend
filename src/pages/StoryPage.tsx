@@ -1,5 +1,7 @@
-import { Empty } from 'antd'
+import { Empty, Spin } from 'antd'
 import styled from 'styled-components'
+
+import { useUser } from '../context/UserContext'
 
 const Placeholder = styled.div`
   display: flex;
@@ -8,13 +10,26 @@ const Placeholder = styled.div`
   min-height: 60vh;
 `
 
-export function StoryPage() {
+const StoryPage: React.FC = () => {
+  const { user, isLoading } = useUser()
+
+  if (isLoading) {
+    return (
+      <Placeholder>
+        <Spin />
+      </Placeholder>
+    )
+  }
+
+  const description = user?.username
+    ? `Story Options are under construction, ${user.username}. Check back soon!`
+    : 'Story Options are under construction. Check back soon!'
+
   return (
     <Placeholder>
-      <Empty
-        description="Story Options are under construction. Check back soon!"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
+      <Empty description={description} image={Empty.PRESENTED_IMAGE_SIMPLE} />
     </Placeholder>
   )
 }
+
+export default StoryPage

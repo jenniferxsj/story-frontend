@@ -29,7 +29,9 @@ import {
   SidebarNav,
   Title,
 } from './AppLayout.styles'
-import { useGetCurrentUser, useLogout } from '../services/auth'
+import { useLogout } from '../services/auth'
+import { useUser } from '../context/UserContext'
+import { useQueryClient } from '@tanstack/react-query'
 
 const BrandIcon = styled.span`
   display: inline-flex;
@@ -54,53 +56,51 @@ const tabItems: TabsProps['items'] = [
 const supportLink = { label: 'Help & Support', icon: <QuestionCircleOutlined />, href: '#' };
 
 export function AppLayout() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const { data: currentUser, isLoading: loadingCurrentUser } = useGetCurrentUser();
+  const navigate = useNavigate()
+  const location = useLocation()
+  const queryClient = useQueryClient()
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const { user, isLoading: loadingCurrentUser } = useUser()
 
   const logoutMutation = useLogout({
     onSuccess: () => {
-      message.success('Signed out successfully.');
-      navigate('/');
+      message.success('Signed out successfully.')
+      queryClient.removeQueries({ queryKey: ['current-user'] })
+      navigate('/')
     },
     onError: () => {
-      message.error('Unable to sign out. Please try again.');
+      message.error('Unable to sign out. Please try again.')
     },
-  });
+  })
 
-  const activeKey = useMemo(() => {
+  const activeTab = useMemo(() => {
     const match = tabItems?.find(({ key }) => location.pathname.startsWith(key))
-    return match?.key ?? '/dashboard'
+    return match ?? tabItems?.[0]
   }, [location.pathname])
 
   const handleTabChange: TabsProps['onChange'] = (key) => {
-    if (key !== activeKey) {
+    if (key !== activeTab?.key) {
       navigate(key)
     }
   }
 
-  const toggleSidebar = () => {
-    setIsCollapsed((prev) => !prev)
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'logout',
+      label: 'Log Out',
+      icon: <LogoutOutlined />,
+      disabled: logoutMutation.isPending,
+    },
+  ]
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'logout') {
+      logoutMutation.mutate()
+    }
   }
 
-  const userMenuItems: MenuProps['items'] = [
-      {
-        key: 'logout',
-        label: 'Log Out',
-        icon: <LogoutOutlined />,
-        disabled: logoutMutation.isPending,
-      },
-    ];
-  
-    const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-      if (key === 'logout') {
-        logoutMutation.mutate();
-      }
-    };
-
-  if (loadingCurrentUser || !currentUser) {
-    return <Spin />;
+  if (loadingCurrentUser || !user) {
+    return <Spin />
   }
 
   return (
@@ -113,16 +113,16 @@ export function AppLayout() {
             </BrandIcon>
             <Title $collapsed={isCollapsed}>Story Tailor</Title>
           </BrandContent>
-          {!isCollapsed && <CollapseButton
-            aria-label='Collapse sidebar'
-            onClick={() => setIsCollapsed(true)}
+          <CollapseButton
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            onClick={() => setIsCollapsed((prev) => !prev)}
           >
-            <MenuFoldOutlined />
-          </CollapseButton>}
+            {isCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </CollapseButton>
         </SidebarBrand>
         <SidebarNav $collapsed={isCollapsed} aria-label="Primary navigation">
-          {isCollapsed ? <MenuUnfoldOutlined onClick={() => setIsCollapsed(false)} /> : tabItems?.map(({ label, icon, key }) => {
-            const isActive = key === activeKey
+          {tabItems?.map(({ label, icon, key }) => {
+            const isActive = key === activeTab?.key
             return (
               <SidebarLink
                 key={key}
@@ -153,24 +153,27 @@ export function AppLayout() {
             <MobileMenuButton aria-label="Open navigation">
               <MenuOutlined />
             </MobileMenuButton>
-            <Title>Welcome, {currentUser?.username ?? 'Momo'}!</Title>
+            <Title>{activeTab?.label ?? 'Dashboard'}</Title>
           </HeaderStart>
           <HeaderActions>
-            <Dropdown
-              menu={{
-                items: userMenuItems,
-                onClick: handleMenuClick,
-              }}
-              placement="bottomRight"
-              trigger={['click']}
-            >
-              <Avatar
-                $image="https://lh3.googleusercontent.com/aida-public/AB6AXuBdRNtZ16GzoWr-5G3wOBRXbBWati6tfb7fsK2RaPSWmbm5bcBZZiKs7zuG-4Wy7Y29fuTJ5R7fXo99mUQr8jMvEuX52PjVfpTtUZtscMCyjHTIap_QatlCOYN5liJTWZNlpT67Le6sCf_ZQbhzJPEMI3dn2mUsN_G-P1At5JehxLWsYT2SvTnYXEppnHXxs4lR8w7TRQRUhe3kgySSA-uP1XbUtHWbUwltvuyO7J7KdMB61qi1F0qK3etk1DH51ZY3qCyjjDodTBo"
-                role="button"
-                aria-label="Account menu"
-                tabIndex={0}
-              />
-            </Dropdown>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <span>Welcome {user.username ?? 'User'}</span>
+              <Dropdown
+                menu={{
+                  items: userMenuItems,
+                  onClick: handleMenuClick,
+                }}
+                placement="bottomRight"
+                trigger={['click']}
+              >
+                <Avatar
+                  $image="https://lh3.googleusercontent.com/aida-public/AB6AXuBdRNtZ16GzoWr-5G3wOBRXbBWati6tfb7fsK2RaPSWmbm5bcBZZiKs7zuG-4Wy7Y29fuTJ5R7fXo99mUQr8jMvEuX52PjVfpTtUZtscMCyjHTIap_QatlCOYN5liJTWZNlpT67Le6sCf_ZQbhzJPEMI3dn2mUsN_G-P1At5JehxLWsYT2SvTnYXEppnHXxs4lR8w7TRQRUhe3kgySSA-uP1XbUtHWbUwltvuyO7J7KdMB61qi1F0qK3etk1DH51ZY3qCyjjDodTBo"
+                  role="button"
+                  aria-label="Account menu"
+                  tabIndex={0}
+                />
+              </Dropdown>
+            </div>
           </HeaderActions>
         </Header>
         <Outlet />

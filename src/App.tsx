@@ -5,8 +5,8 @@ import { ProtectedRoute } from './routes/ProtectedRoute'
 import { WelcomePage } from './pages/WelcomePage'
 import DashboardPage from './pages/DashboardPage'
 import { AppLayout } from './layouts/AppLayout'
-import { BookReportPage } from './pages/BookReportPage'
-import { StoryPage } from './pages/StoryPage'
+import BookReportPage from './pages/BookReportPage'
+import StoryPage from './pages/StoryPage'
 
 function App() {
   return (

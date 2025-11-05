@@ -1,7 +1,7 @@
 import { useEffect, useState, type MouseEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { BookFilled } from '@ant-design/icons'
-import { Button, Form, Input, message } from 'antd'
+import { Button, Form, Input, message, Spin } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
@@ -29,13 +29,13 @@ import {
   WelcomeLayout,
 } from './WelcomePage.styles'
 import {
-  useGetCurrentUser,
   useLogin,
   useLogout,
   useSignup,
   type LoginPayload,
   type SignupPayload,
 } from '../services/auth'
+import { useUser } from '../context/UserContext'
 
 const footerLinks = [
   { label: 'About', href: '#' },
@@ -54,7 +54,7 @@ export function WelcomePage() {
   const location = useLocation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { data: currentUser } = useGetCurrentUser()
+  const { user: currentUser, isLoading: loadingUser } = useUser()
   const logoutMutation = useLogout({
     onSuccess: () => {
       message.success('Signed out successfully.')
@@ -84,6 +84,7 @@ export function WelcomePage() {
       message.success('Signed in successfully.')
       signInForm.resetFields()
       handleCloseAuthModal()
+      queryClient.invalidateQueries({ queryKey: ['current-user'] })
       const destination =
         safeBackFromState && safeBackFromState !== '/' ? safeBackFromState : '/dashboard'
       navigate(destination)
@@ -231,6 +232,16 @@ export function WelcomePage() {
       </SwitchPrompt>
     </AuthForm>
   )
+
+  if (loadingUser) {
+    return (
+      <WelcomeLayout>
+        <WelcomeContent>
+          <Spin />
+        </WelcomeContent>
+      </WelcomeLayout>
+    )
+  }
 
   return (
     <WelcomeLayout>

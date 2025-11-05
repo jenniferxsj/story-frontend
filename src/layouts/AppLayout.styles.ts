@@ -20,18 +20,16 @@ interface SidebarStateProps {
 export const Sidebar = styled.aside<SidebarStateProps>`
   position: sticky;
   top: 0;
-  display: none;
+  height: 100vh;
+  display: flex;
   width: ${({ $collapsed }) => ($collapsed ? '72px' : '256px')};
   flex-shrink: 0;
   border-right: 1px solid ${colors.borderLight};
   background: ${colors.surfaceLight};
   overflow: hidden;
 
-  @media (min-width: 768px) {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
+  flex-direction: column;
+  align-items: stretch;
 
   @media (prefers-color-scheme: dark) {
     border-right-color: ${colors.borderDark};
@@ -44,6 +42,8 @@ export const SidebarNav = styled.nav<SidebarStateProps>`
   flex-direction: column;
   gap: 8px;
   padding: 24px 16px;
+  flex: 1;
+  overflow-y: auto;
 
   ${({ $collapsed }) =>
     $collapsed &&

@@ -18,7 +18,8 @@ export interface SignupPayload {
 const queryParams = {
   retry: 1,
   retryDelay: 1000,
-  staleTime: 5 * 60 * 1000
+  staleTime: 30 * 60 * 1000,  // 30 minutes
+  cacheTime: 30 * 60 * 1000
 }
 
 const loginRequest = async (payload: LoginPayload) => {
@@ -72,12 +73,11 @@ export function useGetCurrentUser() {
     queryFn: async () => {
       try {
         const res = await http.get<User>('/auth/currentUser')
-        console.log('user data: ', res)
-        return res?.data
+        return res?.data ?? null
       } catch {
-        throw new Error('Error getting current user')
+        return null
       }
     },
-    ...queryParams
+    ...queryParams,
   });
 };
