@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { Link } from 'react-router-dom'
 
 export const colors = {
   primary: '#2A4D69',
@@ -198,7 +199,7 @@ export const SectionHeader = styled.div`
   }
 `;
 
-export const SectionLink = styled.a`
+export const SectionLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 4px;

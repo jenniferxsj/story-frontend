@@ -113,7 +113,7 @@ const DashboardPage = () => {
         <Section aria-labelledby="recent-reports">
           <SectionHeader>
             <h2 id="recent-reports">Recent Book Reports</h2>
-            <SectionLink href="#">
+            <SectionLink to="/reports">
               <span>View All</span>
               <ArrowRightOutlined />
             </SectionLink>
@@ -145,7 +145,7 @@ const DashboardPage = () => {
         <Section aria-labelledby="recent-stories">
           <SectionHeader>
             <h2 id="recent-stories">Recent Generated Stories</h2>
-            <SectionLink href="#">
+            <SectionLink to="/stories">
               <span>View All</span>
               <ArrowRightOutlined />
             </SectionLink>
