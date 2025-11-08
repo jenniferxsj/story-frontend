@@ -37,20 +37,13 @@ export const Sidebar = styled.aside<SidebarStateProps>`
   }
 `;
 
-export const SidebarNav = styled.nav<SidebarStateProps>`
+export const SidebarNav = styled.nav`
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 24px 16px;
   flex: 1;
   overflow-y: auto;
-
-  ${({ $collapsed }) =>
-    $collapsed &&
-    css`
-      padding: 24px 8px;
-      align-items: center;
-    `}
 `;
 
 export const SidebarBrand = styled.div<SidebarStateProps>`

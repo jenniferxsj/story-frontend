@@ -154,8 +154,20 @@ export const CollectionWrapper = styled.section`
 
 export const CollectionPagination = styled.div`
   display: flex;
-  justify-content: flex-end;
-  padding-right: 8px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0 8px;
+`
+
+export const PaginationInfo = styled.span`
+  font-size: 14px;
+  color: ${colors.subtleLight};
+
+  @media (prefers-color-scheme: dark) {
+    color: ${colors.subtleDark};
+  }
 `
 
 export const CollectionGrid = styled.div`

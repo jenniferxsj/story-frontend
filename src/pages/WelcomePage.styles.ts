@@ -49,17 +49,7 @@ export const Brand = styled.div`
   @media (prefers-color-scheme: dark) {
     color: ${colors.textPrimaryDark};
   }
-`
-
-export const BrandIcon = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  color: ${colors.primary};
-  font-size: 20px;
-`
+`;
 
 export const BrandText = styled(Typography.Text)`
   && {

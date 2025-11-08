@@ -11,7 +11,6 @@ import {
 import { Dropdown, message, Spin, type MenuProps, type TabsProps } from 'antd'
 import { useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import styled from 'styled-components'
 import {
   AppMainLayout,
   Avatar,
@@ -32,20 +31,7 @@ import {
 import { useLogout } from '../services/auth'
 import { useUser } from '../context/UserContext'
 import { useQueryClient } from '@tanstack/react-query'
-
-const BrandIcon = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  font-size: 20px;
-  color: #2a4d69;
-
-  @media (prefers-color-scheme: dark) {
-    color: #ffffff;
-  }
-`;
+import IconComponent from '../component/Icon'
 
 const tabItems: TabsProps['items'] = [
   { key: '/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
@@ -108,20 +94,18 @@ export function AppLayout() {
       <Sidebar $collapsed={isCollapsed}>
         <SidebarBrand $collapsed={isCollapsed}>
           <BrandContent $collapsed={isCollapsed}>
-            <BrandIcon>
-              <BookOutlined />
-            </BrandIcon>
+            <IconComponent />
             <Title $collapsed={isCollapsed}>Story Tailor</Title>
           </BrandContent>
           <CollapseButton
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            onClick={() => setIsCollapsed((prev) => !prev)}
+            onClick={() => setIsCollapsed(true)}
           >
-            {isCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            {!isCollapsed && <MenuFoldOutlined />}
           </CollapseButton>
         </SidebarBrand>
-        <SidebarNav $collapsed={isCollapsed} aria-label="Primary navigation">
-          {tabItems?.map(({ label, icon, key }) => {
+        <SidebarNav aria-label="Primary navigation">
+          {isCollapsed && <MenuUnfoldOutlined style={{marginLeft: '4px'}} onClick={() => setIsCollapsed(false)}/>}
+          {!isCollapsed && tabItems?.map(({ label, icon, key }) => {
             const isActive = key === activeTab?.key
             return (
               <SidebarLink

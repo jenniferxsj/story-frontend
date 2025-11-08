@@ -15,6 +15,7 @@ import {
   CollectionTitle,
   CollectionWrapper,
   CollectionPagination,
+  PaginationInfo,
   PageHeader,
   PageLayout,
   SearchField,
@@ -26,8 +27,9 @@ import {
   useCreateBookProfile,
   useGetCurrentUserProfiles,
 } from "../services/profile";
+import EmptyComponent from "../component/emptyContent/EmptyContent";
 
-const pageSize = 6;
+const pageSize = 3;
 
 const BookReportPage: React.FC = () => {
   const { user, isLoading } = useUser();
@@ -59,8 +61,11 @@ const BookReportPage: React.FC = () => {
         message.success("Book report created");
       },
       (error) => {
-        message.error("Failed to create book report: ", error.message);
-      }, username
+        const description =
+          error instanceof Error ? error.message : "An unexpected error occurred";
+        message.error(`Failed to create book report: ${description}`);
+      },
+      username
     );
 
   const handleCloseModal = () => {
@@ -83,6 +88,10 @@ const BookReportPage: React.FC = () => {
 
   const reports: BookProfile[] = profilePage?.content ?? [];
   const totalResults = profilePage?.totalElements ?? 0;
+  const startIndex =
+    totalResults === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endIndex =
+    totalResults === 0 ? 0 : Math.min(currentPage * pageSize, totalResults);
 
   return (
     <Content>
@@ -102,46 +111,53 @@ const BookReportPage: React.FC = () => {
         </PageHeader>
 
         <CollectionWrapper>
-          <CollectionGrid>
-            {reports.map(
-              ({
-                id,
-                title,
-                author,
-                userNote,
-                styleSummary,
-                appealSummary,
-              }) => (
-                <CollectionCard key={`${id}-${title}`}>
-                  <CollectionContent>
-                    <div>
-                      <CollectionTitle>{title}</CollectionTitle>
-                      <CollectionMeta>by {author}</CollectionMeta>
-                    </div>
-                    <CollectionSummary>
-                      <strong>User Note:</strong>
-                      <p>{userNote}</p>
-                    </CollectionSummary>
-                    <CollectionSummary>
-                      <strong>Styled Summary:</strong>
-                      <p>{styleSummary}</p>
-                    </CollectionSummary>
-                    <CollectionSummary>
-                      <strong>Appeal Summary:</strong>
-                      <p>{appealSummary}</p>
-                    </CollectionSummary>
-                  </CollectionContent>
-                  <CollectionActions>
-                    <ActionRow>
-                      <ActionRowButton $variant="link">Detail</ActionRowButton>
-                      <ActionRowButton $variant="ghost">Delete</ActionRowButton>
-                    </ActionRow>
-                  </CollectionActions>
-                </CollectionCard>
-              )
-            )}
-          </CollectionGrid>
+          {reports.length === 0 ? (
+            <EmptyComponent />
+          ) : (
+            <CollectionGrid>
+              {reports.map(
+                ({
+                  id,
+                  title,
+                  author,
+                  userNote,
+                  styleSummary,
+                  appealSummary,
+                }) => (
+                  <CollectionCard key={`${id}-${title}`}>
+                    <CollectionContent>
+                      <div>
+                        <CollectionTitle>{title}</CollectionTitle>
+                        <CollectionMeta>by {author}</CollectionMeta>
+                      </div>
+                      <CollectionSummary>
+                        <strong>User Note:</strong>
+                        <p>{userNote}</p>
+                      </CollectionSummary>
+                      <CollectionSummary>
+                        <strong>Styled Summary:</strong>
+                        <p>{styleSummary}</p>
+                      </CollectionSummary>
+                      <CollectionSummary>
+                        <strong>Appeal Summary:</strong>
+                        <p>{appealSummary}</p>
+                      </CollectionSummary>
+                    </CollectionContent>
+                    <CollectionActions>
+                      <ActionRow>
+                        <ActionRowButton $variant="link">Detail</ActionRowButton>
+                        <ActionRowButton $variant="ghost">Delete</ActionRowButton>
+                      </ActionRow>
+                    </CollectionActions>
+                  </CollectionCard>
+                )
+              )}
+            </CollectionGrid>
+          )}
           <CollectionPagination>
+            <PaginationInfo>
+              {`Showing ${startIndex} to ${endIndex} of ${totalResults} results`}
+            </PaginationInfo>
             <Pagination
               current={currentPage}
               pageSize={pageSize}
@@ -162,7 +178,7 @@ const BookReportPage: React.FC = () => {
         okText="Create"
         cancelText="Cancel"
         confirmLoading={isCreatingReport}
-        destroyOnHidden
+        destroyOnClose
       >
         <Form form={form} layout="vertical">
           <Form.Item

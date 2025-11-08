@@ -44,9 +44,9 @@ export function useGetCurrentUserProfiles(
 }
 
 export function useCreateBookProfile(
-    onCreateBookProfile: (data: BookProfile) => void, 
-    errorCreateBookProfile: (error: any) => void,
-    username: string
+  onCreateBookProfile: (data: BookProfile) => void,
+  errorCreateBookProfile: (error: unknown) => void,
+  username: string,
 ) {
     const queryClient = useQueryClient();
   return useMutation({

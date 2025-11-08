@@ -1,6 +1,5 @@
 import { useEffect, useState, type MouseEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { BookFilled } from '@ant-design/icons'
 import { Button, Form, Input, message, Spin } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -8,7 +7,6 @@ import {
   AuthForm,
   AuthModal,
   Brand,
-  BrandIcon,
   BrandText,
   FooterLink,
   FooterLinks,
@@ -36,6 +34,7 @@ import {
   type SignupPayload,
 } from '../services/auth'
 import { useUser } from '../context/UserContext'
+import IconComponent from '../component/Icon'
 
 const footerLinks = [
   { label: 'About', href: '#' },
@@ -247,9 +246,7 @@ export function WelcomePage() {
     <WelcomeLayout>
       <WelcomeHeader role="banner">
         <Brand>
-          <BrandIcon aria-hidden>
-            <BookFilled />
-          </BrandIcon>
+         <IconComponent />
           <BrandText strong>
             Story Tailor
           </BrandText>
