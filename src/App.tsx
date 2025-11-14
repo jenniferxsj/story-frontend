@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage'
 import { AppLayout } from './layouts/AppLayout'
 import BookReportPage from './pages/BookReportPage'
 import StoryPage from './pages/StoryPage'
+import StoryOutlinesPage from './pages/StoryOutlinesPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route element={<DashboardPage />} path="/dashboard" />
             <Route element={<BookReportPage />} path="/reports" />
             <Route element={<StoryPage />} path="/stories" />
+            <Route element={<StoryOutlinesPage />} path="/stories/outlines" />
           </Route>
         </Route>
         <Route element={<Navigate replace to="/" />} path="*" />

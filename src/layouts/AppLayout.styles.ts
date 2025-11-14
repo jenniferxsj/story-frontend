@@ -46,6 +46,12 @@ export const SidebarNav = styled.nav`
   overflow-y: auto;
 `;
 
+export const SidebarNavItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
 export const SidebarBrand = styled.div<SidebarStateProps>`
   display: flex;
   align-items: center;
@@ -176,6 +182,77 @@ export const Main = styled.div`
   flex-direction: column;
   flex: 1;
   min-width: 0;
+`;
+
+export const SidebarSubNav = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 0 20px;
+  padding-left: 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 1px;
+    background: ${colors.borderLight};
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &::before {
+      background: ${colors.borderDark};
+    }
+  }
+`;
+
+interface SidebarSubLinkProps {
+  $active?: boolean
+}
+
+export const SidebarSubLink = styled.a<SidebarSubLinkProps>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${colors.subtleLight};
+  transition: all 0.2s ease;
+  background: transparent;
+
+  ${({ $active }) =>
+    $active &&
+    css`
+      background: rgba(42, 77, 105, 0.12);
+      color: ${colors.primary};
+      font-weight: 600;
+    `}
+
+  &:hover {
+    background: rgba(42, 77, 105, 0.08);
+    color: ${colors.primary};
+  }
+
+  @media (prefers-color-scheme: dark) {
+    color: ${colors.subtleDark};
+
+    ${({ $active }) =>
+      $active &&
+      css`
+        background: rgba(67, 160, 168, 0.15);
+        color: ${colors.accent};
+      `}
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: ${colors.accent};
+    }
+  }
 `;
 
 export const Header = styled.header`

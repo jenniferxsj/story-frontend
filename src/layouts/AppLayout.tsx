@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons'
 import { Dropdown, message, Spin, type MenuProps, type TabsProps } from 'antd'
 import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   AppMainLayout,
@@ -26,6 +27,9 @@ import {
   SidebarFooter,
   SidebarLink,
   SidebarNav,
+  SidebarNavItem,
+  SidebarSubLink,
+  SidebarSubNav,
   Title,
 } from './AppLayout.styles'
 import { useLogout } from '../services/auth'
@@ -33,10 +37,30 @@ import { useUser } from '../context/UserContext'
 import { useQueryClient } from '@tanstack/react-query'
 import IconComponent from '../component/Icon'
 
-const tabItems: TabsProps['items'] = [
+type SidebarSubTab = {
+  key: string
+  label: string
+}
+
+type SidebarTabItem = {
+  key: string
+  label: string
+  icon: ReactNode
+  subTabs?: SidebarSubTab[]
+}
+
+const tabItems: SidebarTabItem[] = [
   { key: '/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
   { key: '/reports', label: 'Book Report', icon: <BookOutlined /> },
-  { key: '/stories', label: 'Story Options', icon: <StarOutlined /> },
+  {
+    key: '/stories',
+    label: 'Story Studio',
+    icon: <StarOutlined />,
+    subTabs: [
+      { key: '/stories', label: 'All Stories' },
+      { key: '/stories/outlines', label: 'Story Outlines' },
+    ],
+  },
 ]
 
 const supportLink = { label: 'Help & Support', icon: <QuestionCircleOutlined />, href: '#' };
@@ -60,9 +84,47 @@ export function AppLayout() {
   })
 
   const activeTab = useMemo(() => {
-    const match = tabItems?.find(({ key }) => location.pathname.startsWith(key))
+    const match = tabItems?.find(({ key, subTabs }) => {
+      if (location.pathname.startsWith(key)) {
+        return true
+      }
+
+      if (subTabs?.some(({ key: subKey }) => location.pathname.startsWith(subKey))) {
+        return true
+      }
+
+      return false
+    })
     return match ?? tabItems?.[0]
   }, [location.pathname])
+
+  const activeSubTab = useMemo(() => {
+    if (!activeTab?.subTabs) {
+      return undefined
+    }
+
+    const normalizedPath = location.pathname.replace(/\/+$/, '')
+    let matched: SidebarSubTab | undefined
+
+    activeTab.subTabs.forEach((subTab) => {
+      const normalizedKey = subTab.key.replace(/\/+$/, '')
+      const isExactMatch = normalizedPath === normalizedKey
+      const isNestedMatch = normalizedPath.startsWith(`${normalizedKey}/`)
+
+      if (isExactMatch || isNestedMatch) {
+        if (!matched) {
+          matched = subTab
+          return
+        }
+
+        if (normalizedKey.length > matched.key.length) {
+          matched = subTab
+        }
+      }
+    })
+
+    return matched
+  }, [activeTab, location.pathname])
 
   const handleTabChange: TabsProps['onChange'] = (key) => {
     if (key !== activeTab?.key) {
@@ -105,22 +167,45 @@ export function AppLayout() {
         </SidebarBrand>
         <SidebarNav aria-label="Primary navigation">
           {isCollapsed && <MenuUnfoldOutlined style={{marginLeft: '4px'}} onClick={() => setIsCollapsed(false)}/>}
-          {!isCollapsed && tabItems?.map(({ label, icon, key }) => {
-            const isActive = key === activeTab?.key
+          {!isCollapsed && tabItems?.map(({ label, icon, key, subTabs }) => {
+            const isGroupActive = key === activeTab?.key
             return (
-              <SidebarLink
-                key={key}
-                $active={isActive}
-                $collapsed={isCollapsed}
-                href={key}
-                onClick={(event) => {
-                  event.preventDefault()
-                  handleTabChange(key)
-                }}
-              >
-                {icon}
-                {!isCollapsed && <span>{label}</span>}
-              </SidebarLink>
+              <SidebarNavItem key={key}>
+                <SidebarLink
+                  $active={isGroupActive}
+                  $collapsed={isCollapsed}
+                  href={key}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    handleTabChange(key)
+                  }}
+                >
+                  {icon}
+                  {!isCollapsed && <span>{label}</span>}
+                </SidebarLink>
+                {isGroupActive && !isCollapsed && subTabs?.length ? (
+                  <SidebarSubNav aria-label={`${label} options`}>
+                    {subTabs.map(({ key: subKey, label: subLabel }) => {
+                      const isSubActive = subKey === activeSubTab?.key
+                      return (
+                        <SidebarSubLink
+                          key={subKey}
+                          $active={isSubActive}
+                          href={subKey}
+                          onClick={(event) => {
+                            event.preventDefault()
+                            if (!isSubActive) {
+                              navigate(subKey)
+                            }
+                          }}
+                        >
+                          {subLabel}
+                        </SidebarSubLink>
+                      )
+                    })}
+                  </SidebarSubNav>
+                ) : null}
+              </SidebarNavItem>
             )
           })}
         </SidebarNav>
@@ -137,7 +222,7 @@ export function AppLayout() {
             <MobileMenuButton aria-label="Open navigation">
               <MenuOutlined />
             </MobileMenuButton>
-            <Title>{activeTab?.label ?? 'Dashboard'}</Title>
+            <Title>{activeSubTab?.label ?? activeTab?.label ?? 'Dashboard'}</Title>
           </HeaderStart>
           <HeaderActions>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
