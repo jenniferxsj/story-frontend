@@ -3,16 +3,8 @@ import { FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, Modal, Pagination, Spin, message } from "antd";
 
 import {
-  ActionRow,
-  ActionRowButton,
   ActionRowGroup,
-  CollectionActions,
-  CollectionCard,
-  CollectionContent,
   CollectionGrid,
-  CollectionMeta,
-  CollectionSummary,
-  CollectionTitle,
   CollectionWrapper,
   CollectionPagination,
   PaginationInfo,
@@ -28,6 +20,8 @@ import {
   useGetCurrentUserProfiles,
 } from "../services/profile";
 import EmptyComponent from "../component/emptyContent/EmptyContent";
+import SummaryCard from "../component/summaryCard/SummaryCard";
+import { ActionRowButton } from "../component/summaryCard/styles";
 
 const pageSize = 3;
 
@@ -62,7 +56,9 @@ const BookReportPage: React.FC = () => {
       },
       (error) => {
         const description =
-          error instanceof Error ? error.message : "An unexpected error occurred";
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred";
         message.error(`Failed to create book report: ${description}`);
       },
       username
@@ -74,8 +70,8 @@ const BookReportPage: React.FC = () => {
   };
 
   const handleCreateReport = async () => {
-      const values = await form.validateFields();
-      createReport(values);
+    const values = await form.validateFields();
+    createReport(values);
   };
 
   if (isLoading || loadingProfiles) {
@@ -88,8 +84,7 @@ const BookReportPage: React.FC = () => {
 
   const reports: BookProfile[] = profilePage?.content ?? [];
   const totalResults = profilePage?.totalElements ?? 0;
-  const startIndex =
-    totalResults === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const startIndex = totalResults === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endIndex =
     totalResults === 0 ? 0 : Math.min(currentPage * pageSize, totalResults);
 
@@ -103,7 +98,10 @@ const BookReportPage: React.FC = () => {
               <FilterOutlined />
               Filter
             </ActionRowButton>
-            <ActionRowButton $variant="primary" onClick={() => setIsModalOpen(true)}>
+            <ActionRowButton
+              $variant="primary"
+              onClick={() => setIsModalOpen(true)}
+            >
               <PlusOutlined />
               New Report
             </ActionRowButton>
@@ -123,34 +121,23 @@ const BookReportPage: React.FC = () => {
                   userNote,
                   styleSummary,
                   appealSummary,
-                }) => (
-                  <CollectionCard key={`${id}-${title}`}>
-                    <CollectionContent>
-                      <div>
-                        <CollectionTitle>{title}</CollectionTitle>
-                        <CollectionMeta>by {author}</CollectionMeta>
-                      </div>
-                      <CollectionSummary>
-                        <strong>User Note:</strong>
-                        <p>{userNote}</p>
-                      </CollectionSummary>
-                      <CollectionSummary>
-                        <strong>Styled Summary:</strong>
-                        <p>{styleSummary}</p>
-                      </CollectionSummary>
-                      <CollectionSummary>
-                        <strong>Appeal Summary:</strong>
-                        <p>{appealSummary}</p>
-                      </CollectionSummary>
-                    </CollectionContent>
-                    <CollectionActions>
-                      <ActionRow>
-                        <ActionRowButton $variant="link">Detail</ActionRowButton>
-                        <ActionRowButton $variant="ghost">Delete</ActionRowButton>
-                      </ActionRow>
-                    </CollectionActions>
-                  </CollectionCard>
-                )
+                }) => {
+                  const collectionKeyValue: Record<string, string> = {
+                    "User Note: ": userNote,
+                    "Styled Summary: ": styleSummary,
+                    "Appeal Summary: ": appealSummary,
+                  };
+                  return (
+                    <SummaryCard
+                      id={id}
+                      title={title}
+                      metadata={`by ${author}`}
+                      collectionKeyValue={collectionKeyValue}
+                      handleOnDelete={(id) => undefined}
+                      handleOnDetail={(id) => undefined}
+                    />
+                  );
+                }
               )}
             </CollectionGrid>
           )}

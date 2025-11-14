@@ -43,6 +43,8 @@ export default defineConfig([
 ])
 ```
 
+> **Note:** ESLint now enforces trailing commas with the `comma-dangle` rule, so remember to include them in multiline objects, arrays, and parameter lists.
+
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js

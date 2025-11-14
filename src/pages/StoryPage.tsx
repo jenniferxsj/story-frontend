@@ -3,30 +3,14 @@ import { FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Pagination, Spin } from "antd";
 
 import { useUser } from "../context/UserContext";
-import {
-  useGetCurrentUserStories,
-} from "../services/story";
+import { useGetCurrentUserStories } from "../services/story";
 import type { Story } from "../types/story";
 import { Content } from "./DashboardPage.styles";
+import { PaginationInfo } from "./StoryPage.styles";
 import {
-  PaginationInfo,
-  StoryLabel,
-  StoryMetaList,
-  StoryMetaRow,
-  StoryPagination,
-  StoryValue,
-} from "./StoryPage.styles";
-import {
-  ActionRow,
-  ActionRowButton,
   ActionRowGroup,
-  CollectionActions,
-  CollectionCard,
-  CollectionContent,
   CollectionGrid,
-  CollectionMeta,
   CollectionPagination,
-  CollectionTitle,
   CollectionWrapper,
   PageHeader,
   PageLayout,
@@ -34,6 +18,8 @@ import {
 } from "./BookReportPage.styles";
 import EmptyComponent from "../component/emptyContent/EmptyContent";
 import dayjs from "dayjs";
+import SummaryCard from "../component/summaryCard/SummaryCard";
+import { ActionRowButton } from "../component/summaryCard/styles";
 
 const pageSize = 6;
 
@@ -77,7 +63,7 @@ const StoryPage: React.FC = () => {
         <Spin />
       </Content>
     );
-  };
+  }
 
   return (
     <Content>
@@ -114,33 +100,20 @@ const StoryPage: React.FC = () => {
                 }) => {
                   const wordCountLabel = `${currentWords.toLocaleString()} / ${targetWords.toLocaleString()}`;
                   const createdDate = dayjs(createdAt).format("MMM DD, YYYY");
+                  const collectionKeyValue: Record<string, string> = {
+                    "Word Count: ": wordCountLabel,
+                    "Core Setting: ":
+                      stateJson?.storyOutline["核心设定"] ?? "无",
+                  };
                   return (
-                    <CollectionCard key={id}>
-                      <CollectionContent>
-                      <div>
-                        <CollectionTitle>{title}</CollectionTitle>
-                        <CollectionMeta>
-                          Created At: {createdDate}
-                        </CollectionMeta>
-                      </div>
-                        <StoryMetaList>
-                          <StoryMetaRow>
-                            <StoryLabel>Word Count</StoryLabel>
-                            <StoryValue>{wordCountLabel}</StoryValue>
-                          </StoryMetaRow>
-                          <StoryMetaRow>
-                            <StoryLabel>Core Setting</StoryLabel>
-                            <StoryValue>{stateJson?.storyOutline["核心设定"] ?? "无"}</StoryValue>
-                          </StoryMetaRow>
-                        </StoryMetaList>
-                      </CollectionContent>
-                      <CollectionActions>
-                        <ActionRow>
-                          <ActionRowButton $variant="link">Detail</ActionRowButton>
-                          <ActionRowButton $variant="ghost">Delete</ActionRowButton>
-                        </ActionRow>
-                      </CollectionActions>
-                    </CollectionCard>
+                    <SummaryCard
+                      id={id}
+                      title={title}
+                      metadata={`Created At: ${createdDate}`}
+                      collectionKeyValue={collectionKeyValue}
+                      handleOnDelete={(id) => undefined}
+                      handleOnDetail={(id) => undefined}
+                    />
                   );
                 }
               )}
