@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { http } from "../lib/http";
-import { type ObjectIdTitleAuthor, type PageRsp, type Story } from "../types/story";
+import { type ObjectIdTitleAuthor, type PageRsp, type Story, type StoryOutline } from "../types/story";
 
 const queryParams = {
   retry: 1,
@@ -47,6 +47,33 @@ export function useGetUserReportList(username: string) {
         return acc;
       }, {});
       return toRecord;
+    },
+    enabled: !!username,
+    ...queryParams,
+  });
+}
+
+export function useGetCurrentUserOutlines(
+  username: string | undefined,
+  page: number,
+  size: number,
+  sort: string
+) {
+  return useQuery({
+    queryKey: ["user-outlines", username, page, size, sort],
+    queryFn: async () => {
+      try {
+        const res = await http.get<PageRsp<StoryOutline[]>>("/outline/currentUser", {
+          params: {
+            page,
+            size,
+            sort,
+          },
+        });
+        return res?.data;
+      } catch {
+        throw new Error("Error getting current user story outlines");
+      }
     },
     enabled: !!username,
     ...queryParams,

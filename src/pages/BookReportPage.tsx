@@ -21,7 +21,7 @@ import {
 } from "../services/profile";
 import EmptyComponent from "../component/emptyContent/EmptyContent";
 import SummaryCard from "../component/summaryCard/SummaryCard";
-import { ActionRowButton } from "../component/summaryCard/styles";
+import { ActionRowButton } from "../component/summaryCard/SummaryCard.styles";
 
 const pageSize = 3;
 

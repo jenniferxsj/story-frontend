@@ -7,7 +7,7 @@ import {
   CollectionMeta,
   CollectionSummary,
   CollectionTitle,
-} from "./styles";
+} from "./SummaryCard.styles";
 
 interface SummaryCardProps {
   id: number | string;

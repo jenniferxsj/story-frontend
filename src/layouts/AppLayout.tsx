@@ -56,10 +56,10 @@ const tabItems: SidebarTabItem[] = [
     key: '/stories',
     label: 'Story Studio',
     icon: <StarOutlined />,
-    subTabs: [
-      { key: '/stories', label: 'All Stories' },
-      { key: '/stories/outlines', label: 'Story Outlines' },
-    ],
+    // subTabs: [
+    //   { key: '/stories', label: 'All Stories' },
+    //   // { key: '/stories/outlines', label: 'Story Outlines' },
+    // ],
   },
 ]
 

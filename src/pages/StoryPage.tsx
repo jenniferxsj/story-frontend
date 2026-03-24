@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Pagination, Spin } from "antd";
 
@@ -19,7 +20,7 @@ import {
 import EmptyComponent from "../component/emptyContent/EmptyContent";
 import dayjs from "dayjs";
 import SummaryCard from "../component/summaryCard/SummaryCard";
-import { ActionRowButton } from "../component/summaryCard/styles";
+import { ActionRowButton } from "../component/summaryCard/SummaryCard.styles";
 
 const pageSize = 6;
 
@@ -29,8 +30,8 @@ const StoryPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const searchPlaceholder = user?.username
-    ? `Search ${user.username}'s reports...`
-    : "Search reports...";
+    ? `Search ${user.username}'s story...`
+    : "Search stories...";
 
   const username = user?.username ?? "";
 
@@ -44,6 +45,8 @@ const StoryPage: React.FC = () => {
     pageSize,
     "createdAt,desc"
   );
+
+  const navigate = useNavigate();
 
   const stories: Story[] = storyPage?.content ?? [];
   const totalResults = storyPage?.totalElements ?? 0;
@@ -112,7 +115,20 @@ const StoryPage: React.FC = () => {
                       metadata={`Created At: ${createdDate}`}
                       collectionKeyValue={collectionKeyValue}
                       handleOnDelete={(id) => undefined}
-                      handleOnDetail={(id) => undefined}
+                      handleOnDetail={() =>
+                        navigate("/stories/outlines", {
+                          state: {
+                            story: {
+                              id,
+                              title,
+                              currentWords,
+                              targetWords,
+                              stateJson,
+                              createdAt,
+                            },
+                          },
+                        })
+                      }
                     />
                   );
                 }
