@@ -8,6 +8,7 @@ import {
   CollectionSummary,
   CollectionTitle,
 } from "./SummaryCard.styles";
+import type { ReactNode } from "react";
 
 interface SummaryCardProps {
   id: number | string;
@@ -16,6 +17,7 @@ interface SummaryCardProps {
   collectionKeyValue: { [key: string]: string };
   handleOnDetail?: (id: number | string) => void;
   handleOnDelete?: (id: number | string) => void;
+  extraActions?: ReactNode;
 }
 
 const SummaryCard = ({
@@ -25,6 +27,7 @@ const SummaryCard = ({
   collectionKeyValue,
   handleOnDetail,
   handleOnDelete,
+  extraActions,
 }: SummaryCardProps) => {
   return (
     <CollectionCard>
@@ -47,6 +50,7 @@ const SummaryCard = ({
               Detail
             </ActionRowButton>
           )}
+          {extraActions}
           {handleOnDelete && (
             <ActionRowButton
               $variant="ghost"

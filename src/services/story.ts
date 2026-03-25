@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { http } from "../lib/http";
 import { type ObjectIdTitleAuthor, type PageRsp, type Story, type StoryOutline } from "../types/story";
 
@@ -57,7 +57,7 @@ export function useGetCurrentUserOutlines(
   username: string | undefined,
   page: number,
   size: number,
-  sort: string
+  sort?: string
 ) {
   return useQuery({
     queryKey: ["user-outlines", username, page, size, sort],
@@ -70,6 +70,7 @@ export function useGetCurrentUserOutlines(
             sort,
           },
         });
+        console.log("Fetched outlines:", res?.data);
         return res?.data;
       } catch {
         throw new Error("Error getting current user story outlines");
@@ -77,5 +78,53 @@ export function useGetCurrentUserOutlines(
     },
     enabled: !!username,
     ...queryParams,
+  });
+}
+
+export function useGetStoryOutlineById(storyOutlineId: number | undefined) {
+  return useQuery({
+    queryKey: ["story-detail", storyOutlineId],
+    queryFn: async () => {
+      try {
+        const res = await http.get<StoryOutline>(`/outline/id/${storyOutlineId}`);
+        return res?.data;
+      } catch {
+        throw new Error("Error getting story outline detail");
+      }
+    },
+    enabled: !!storyOutlineId,
+    ...queryParams,
+  });
+}
+
+export function useGetStoryById(storyId: number | undefined) {
+  return useQuery({
+    queryKey: ["story-by-id", storyId],
+    queryFn: async () => {
+      try {
+        const res = await http.get<Story>(`/story/id/${storyId}`);
+        return res?.data;
+      } catch {
+        throw new Error("Error getting story detail");
+      }
+    },
+    enabled: !!storyId,
+    ...queryParams,
+  });
+}
+
+export function useCreateStoryFromOutline(
+  onSuccess: (story: Story) => void,
+  onError: (error: unknown) => void
+) {
+  return useMutation({
+    mutationFn: async (outlineId: number) => {
+      const res = await http.post<Story>(`/story`, {
+        outlineId,
+      });
+      return res?.data;
+    },
+    onSuccess,
+    onError,
   });
 }

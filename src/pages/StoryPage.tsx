@@ -95,6 +95,7 @@ const StoryPage: React.FC = () => {
               {stories.map(
                 ({
                   id,
+                  outlineId,
                   title,
                   currentWords,
                   targetWords,
@@ -116,10 +117,11 @@ const StoryPage: React.FC = () => {
                       collectionKeyValue={collectionKeyValue}
                       handleOnDelete={(id) => undefined}
                       handleOnDetail={() =>
-                        navigate("/stories/outlines", {
+                        navigate(`/stories/${id}`, {
                           state: {
                             story: {
                               id,
+                              outlineId,
                               title,
                               currentWords,
                               targetWords,

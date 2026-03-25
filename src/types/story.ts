@@ -52,12 +52,14 @@ export interface StoryOutline {
   id: number;
   userId: string;
   profileIds: number[];
-  userNotes: string;
+  userNotes: string | null;
   displayTitle: string;
+  aiResponseJson?: string | null;
   userOutlineJson: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  isArchieved: boolean;
+  isArchieved?: boolean;
+  archived?: boolean;
 }
 
 export interface ObjectIdTitleAuthor {

@@ -53,12 +53,12 @@ const tabItems: SidebarTabItem[] = [
   { key: '/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
   { key: '/reports', label: 'Book Report', icon: <BookOutlined /> },
   {
-    key: '/stories',
+    key: '/outlines',
     label: 'Story Studio',
     icon: <StarOutlined />,
     // subTabs: [
-    //   { key: '/stories', label: 'All Stories' },
-    //   // { key: '/stories/outlines', label: 'Story Outlines' },
+    //   { key: '/outlines', label: 'Story Outlines' },
+    //   { key: '/stories', label: 'Stories' },
     // ],
   },
 ]
